@@ -5,19 +5,33 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>手写一个简单vue</title>
-    <script src="./js/vue.js" ></script>
+    <script src="./scripts/compile.js" ></script>
+    <script src="./scripts/vue.js" ></script>
 </head>
 <body>
     <div id="app">
         <h3>手写一个简单vue</h3>
-        <span>{{message}}</span>
+        <p>{{message}}</p>
+        <p v-if="show">show or hide</p>
+        <p v-text="color"></p>
         <input type="text" v-model="message" />
+        <button @click="handleClick">点击</button>
     </div>
     <script>
         let vm = new Vue({
             el:"#app",
             data:{
-                message:"123"
+                message:"123",
+                color:"red",
+                show:false
+            },
+            methods:{
+                handleChange(value){
+                    console.log("change value")
+                },
+                handleClick(event){
+                    console.log("click",event)
+                }
             }
         })
     </script>
