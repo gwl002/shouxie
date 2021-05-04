@@ -33,7 +33,6 @@ class Compile{
                     let exp = attr.value;
                     if(this.isDirective(attrName)){
                         const dir = attrName.substring(2);
-                        console.log("dir",dir)
                         this[dir] && this[dir](node,this.$vm,exp);
                     }else if(this.isEvent(attrName)){
                         const eventName = attrName.substring(1);

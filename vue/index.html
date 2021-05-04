@@ -23,14 +23,18 @@
             data:{
                 message:"123",
                 color:"red",
-                show:false
+                show:false,
+                detail:{
+                    name:"gwl002",
+                    nickName:"hualong"
+                }
             },
             methods:{
                 handleChange(value){
                     console.log("change value")
                 },
                 handleClick(event){
-                    console.log("click",event)
+                    this.message = "xxxx"
                 }
             }
         })
