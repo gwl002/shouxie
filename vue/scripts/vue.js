@@ -22,13 +22,16 @@ class Vue{
 
     defineReactive(obj,key,val){
         this.observe(val);
+        const dep = new Dep();
         Object.defineProperty(obj,key,{
             get(){
+                Dep.target && dep.addDep(Dep.target)
                 return val
             },
             set(newVal){
                 if(val===newVal) return;
                 val = newVal;
+                dep.notify();
             }
         })
     }
@@ -56,15 +59,33 @@ class Dep{
         this.deps = []
     }
 
-    addDep(){
-        
+    addDep(dep){
+        this.deps.push(dep)
     }
 
     notify(){
-
+        this.deps.forEach(dep=>{
+            dep.update()
+        })
     }
 }
 
-class Watcher{
 
+class Watcher{
+    static count = 0;
+    constructor(vm,key,cb){
+        this.vm = vm;
+        this.key = key;
+        this.cb = cb;
+        Dep.target = this;
+        this.vm[this.key];
+        Dep.target = null;
+        Watcher.count ++;
+    }
+
+    update(){
+        this.cb.call(this.vm,this.vm[this.key])
+    }
 }
+
+

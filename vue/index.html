@@ -12,8 +12,9 @@
     <div id="app">
         <h3>手写一个简单vue</h3>
         <p>{{message}}</p>
-        <p v-if="show">show or hide</p>
         <p v-text="color"></p>
+        <p v-if="show">show or hide test v-if</p>
+        <p v-show="showOK">show or hide test v-show</p>
         <input type="text" v-model="message" />
         <button @click="handleClick">点击</button>
     </div>
@@ -24,17 +25,15 @@
                 message:"123",
                 color:"red",
                 show:false,
+                showOK:false,
                 detail:{
                     name:"gwl002",
                     nickName:"hualong"
                 }
             },
             methods:{
-                handleChange(value){
-                    console.log("change value")
-                },
                 handleClick(event){
-                    this.message = "xxxx"
+                    this.showOK = !this.showOK
                 }
             }
         })

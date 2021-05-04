@@ -16,7 +16,7 @@ class Compile{
         while( child = el.firstElementChild){
             fragment.appendChild(child);
         }
-        this.Fragment2Vnode(fragment)
+        this.Fragment2Vnode(fragment);
         el.appendChild(fragment);
     }
 
@@ -24,8 +24,7 @@ class Compile{
         let childNodes = fragment.childNodes;
         Array.from(childNodes).forEach((node)=>{
             if(this.isInterpolation(node)){
-                let key = RegExp.$1;
-                node.textContent = this.$vm[key];
+                this.compileText(node);
             }else if(this.isElement(node)){
                 let attrs = node.attributes;
                 Array.from(attrs).forEach(attr=>{
@@ -69,15 +68,89 @@ class Compile{
         }
     }
 
+    update(node,context,exp,dir){
+        const updateFn = this[dir+"Updater"];
+        updateFn && updateFn(node,context[exp]);
+
+        new Watcher(context,exp,function(value){
+            updateFn && updateFn(node,value);
+        })
+    }
+
+    
+    html(node,context,exp){
+        this.update(node,context,exp,"html");
+    }
+
+    htmlUpdater(node,value){
+        node.innerHTML = value;
+    }
+
+    compileText(node){
+        this.update(node,this.$vm,RegExp.$1,"text");
+    }
+
     text(node,context,exp){
-        node.textContent = context[exp];
+        this.update(node,context,exp,"text");
+    }
+
+    textUpdater(node,value){
+        node.textContent = value;
     }
 
     model(node,context,exp){
-        node.value = context[exp];
+        this.update(node,context,exp,"model");
+
         node.addEventListener("input",function(e){
             context[exp] = e.target.value
         })
+    }
+
+    modelUpdater(node,value){
+        node.value = value;
+    }
+
+    if(node,context,exp){
+        const clone = node.cloneNode(true);
+        let comment = document.createComment(`This is v-if tag`);
+        let parentNode = node.parentNode;
+        if(parentNode){
+            parentNode.replaceChild(comment,node);
+        }
+        let value = context[exp];
+        let frag ;
+        if(value){
+            frag=clone.cloneNode(true);
+            parentNode.insertBefore(frag,comment);
+        }
+
+        new Watcher(context,exp,function(value){
+            if(!value){
+                frag && frag.remove();
+            }else{
+                let parentNode = comment.parentNode;
+                frag=clone.cloneNode(true);
+                parentNode.insertBefore(frag,comment);
+            }
+        })
+    }
+
+    show(node,context,exp){
+        const orignalDisplay = window.getComputedStyle(node,null).display;
+
+        let value = context[exp];
+        if(!value){
+            node.style.display = "none"
+        }
+
+        new Watcher(context,exp,function(value){
+            if(!value){
+                node.style.display = "none"
+            }else{
+                node.style.display = orignalDisplay;
+            }
+        })
+
     }
 
 }
